@@ -25,7 +25,7 @@ int  main(int argc, char* argv[])
     int nHostPort;
     int totalRead = 0;
     char page[PAGESIZE];
-
+    printf("we got to line 60!");
     if(argc > 6 || argc < 4)
     {
         printf("\nUsage: download [-c count | -d] host-name host-port path \n");
@@ -52,9 +52,6 @@ int  main(int argc, char* argv[])
         }
     }
 
-    
-   
-
     for(int i = 0; i < strlen(argv[optind+1]) ; i++)
     {
         if(!isdigit(argv[optind+1][i]))
@@ -67,9 +64,8 @@ int  main(int argc, char* argv[])
     nHostPort=atoi(argv[optind+1]);
     strcpy(page,argv[optind+2]);
     strcpy(strHostName,argv[optind]);
-    
 
-    printf("\nMaking a socket\n");
+    //printf("\nMaking a socket\n");
     /* make a socket */
     hSocket=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 
@@ -102,7 +98,6 @@ int  main(int argc, char* argv[])
         printf("\nCould not connect to host\n");
         return 0;
     }
-
 
     //Create HTTP Message
     char* message = (char*)malloc(MAXGET);
@@ -158,7 +153,7 @@ int  main(int argc, char* argv[])
     }
     if(cflag == false)
     {
-         printf("\nbody: %s\n",body);
+         printf("\n%s\n",body);
     }
     /* write what we received back to the server */
     //write(hSocket,pBuffer,nReadAmount);
