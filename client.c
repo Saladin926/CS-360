@@ -60,7 +60,7 @@ int  main(int argc, char* argv[])
         {
                 if(!isdigit(argv[optind+1][i]))
                 {
-                        printf("\ninvalidport\n");
+                        printf("\nInvalid port\n");
                         return 0;
                 }
 
@@ -84,7 +84,7 @@ int  main(int argc, char* argv[])
         pHostInfo=gethostbyname(strHostName);
         if(pHostInfo == NULL)
         {
-                printf("\ninvalid host name\n");
+                printf("\nInvalid host name\n");
                 return 0;
         }
         /* copy address into long */
@@ -151,12 +151,12 @@ int  main(int argc, char* argv[])
         body += 3;
         if(debug == true)
         {
-                printf("Request: %s\n", message);
-                printf("Header: %s\n",wholeMessage);
+            printf("Request: %s\n", message);
+            printf("Header: %s\n",wholeMessage);
         }
         if(cflag == false)
         {
-                 printf("\n%s*\n",body);
+            printf("\n%s\n",body);
 
 
         }
@@ -164,7 +164,7 @@ int  main(int argc, char* argv[])
         /* close socket */
         if(close(hSocket) == SOCKET_ERROR)
         {
-                printf("\nCould not close socket\n");
-                return 0;
+            printf("\nCould not close socket\n");
+            return 0;
         }
 }
