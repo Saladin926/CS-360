@@ -6,12 +6,13 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define SOCKET_ERROR        -1
 #define BUFFER_SIZE         100
 #define HOST_NAME_SIZE      255
 #define MAXGET 1000
-
+#define PAGESIZE 700
 int  main(int argc, char* argv[])
 {
     int hSocket;                 /* handle to socket */
@@ -23,17 +24,50 @@ int  main(int argc, char* argv[])
     char strHostName[HOST_NAME_SIZE];
     int nHostPort;
     int totalRead = 0;
+    char page[PAGESIZE];
 
-    if(argc < 6)
+    if(argc > 6 || argc < 4)
     {
-        printf("\nUsage: myfile host-name host-port path -c or -d\n");
+        printf("\nUsage: download [-c count | -d] host-name host-port path \n");
         return 0;
     }
-    else
+
+    extern char* optarg;
+    int c, times_to_download = 1, err = 0;
+    bool debug = false,cflag = false;//cflag means to display body
+    while((c = getopt(argc, argv, "c:d")) !=-1)
     {
-        strcpy(strHostName,argv[1]);
-        nHostPort=atoi(argv[2]);
+        switch(c)
+        {
+            case 'c':
+                times_to_download = atoi(optarg);
+                cflag = true;
+                break;
+            case 'd':
+                debug = true;
+                break;
+            case '?':
+                err = 1;
+                break;
+        }
     }
+
+    
+   
+
+    for(int i = 0; i < strlen(argv[optind+1]) ; i++)
+    {
+        if(!isdigit(argv[optind+1][i]))
+        {
+            printf("\ninvalidport\n");
+            return 0;
+        }
+
+    }
+    nHostPort=atoi(argv[optind+1]);
+    strcpy(page,argv[optind+2]);
+    strcpy(strHostName,argv[optind]);
+    
 
     printf("\nMaking a socket\n");
     /* make a socket */
@@ -46,7 +80,13 @@ int  main(int argc, char* argv[])
     }
 
     /* get IP address from name */
+
     pHostInfo=gethostbyname(strHostName);
+    if(pHostInfo == NULL)
+    {
+        printf("\ninvalid host name\n");
+        return 0;
+    }
     /* copy address into long */
     memcpy(&nHostAddress,pHostInfo->h_addr,pHostInfo->h_length);
 
@@ -66,18 +106,24 @@ int  main(int argc, char* argv[])
 
     //Create HTTP Message
     char* message = (char*)malloc(MAXGET);
-    sprintf(message, "GET %s HTTP/1.1\r\nHost:%s:%s\r\n\r\n",argv[3],argv[1],argv[2]);
-    printf("\nRequest: %s\n~~\n", message);
+    sprintf(message, "GET %s HTTP/1.1\r\nHost:%s:%s\r\n\r\n",page,strHostName,nHostPort);
+    
     //here we are going to allocate space with memory management
     //Send HTTP on the SOcket
-    write(hSocket,message,strlen(message));//this is an example of writing a simple line request to the server, we will need to parse
+    for(int i = 0 ; i < times_to_download ; i++)
+    {
+        write(hSocket,message,strlen(message));//this is an example of writing a simple line request to the server, we will need to parse
+    }
+     
     //Read Response back from Socket
-    char* wholeMessage = "";
+    char* wholeMessage = (char*)malloc(1);
+    wholeMessage[0] = '\0';
     do
     {
         nReadAmount=read(hSocket,pBuffer,BUFFER_SIZE);
-        if(nReadAmount < BUFFER_SIZE) {
-                pBuffer[nReadAmount] = '\0';
+        if(nReadAmount < BUFFER_SIZE) 
+        {
+            pBuffer[nReadAmount] = '\0';
         }
         totalRead+=nReadAmount;
         char* new_str;
@@ -87,18 +133,33 @@ int  main(int argc, char* argv[])
             strcat(new_str,wholeMessage);
             strcat(new_str,pBuffer);
 
-            wholeMessage = new_str;
+            free(wholeMessage);
+            wholeMessage = (char*)malloc(strlen(new_str) + 1);
+            strcpy(wholeMessage, new_str);
         }
         else
         {
             printf("\nMalloc for reading in the response absolutely failed!\n");
             // exit?
         }
+        free(new_str);
     }
     while(nReadAmount >= BUFFER_SIZE);
 
-
-    printf("\nResponse: %s\n~~Bytes read: %i~~\n",wholeMessage,totalRead);
+    const char* delimeter = "\r\n\r\n";
+    char* body = strstr(wholeMessage,delimeter);
+    body[0] = '\0';
+    body += 3;
+    if(debug == true)
+    {
+        printf("\nRequest: %s\n~~\n", message);
+        printf("\nResponse: %s\n~~Bytes read: %i~~\n",wholeMessage,totalRead);
+        printf("\nHeader: %s\n",wholeMessage);
+    }
+    if(cflag == false)
+    {
+         printf("\nbody: %s\n",body);
+    }
     /* write what we received back to the server */
     //write(hSocket,pBuffer,nReadAmount);
     //printf("\nWriting \"%s\" to server",pBuffer);
