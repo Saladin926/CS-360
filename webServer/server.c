@@ -34,7 +34,8 @@ void serve(int hSocket)
                 slashPos = filePointer.find("/",slashPos);
 
                 size_t foundSpace = filePointer.find_last_of(" ");
-                filePath = filePointer.substr(slashPos+1,foundSpace - slashPos);
+                slashPos += 1;
+                filePath = filePointer.substr(slashPos,foundSpace - slashPos);
 
                 cout << "This is the file Path: " << filePath << endl;
             
@@ -42,7 +43,7 @@ void serve(int hSocket)
             
         }
         
-        cout << "***this should be the file path: " << filePath << endl;
+        cout << "File path: " << filePath << "temporarily"<< endl;
         //set content type and content length dynamically
         //parse the get request for file extension
         //for the content type
