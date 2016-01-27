@@ -190,10 +190,10 @@ int main(int argc, char* argv[])
         printf("got from browser \n %s\n",pBuffer);
 
         //call server function
-        serve(hSocket);
+        serve(hServerSocket);
        
         /* close socket */
-        if(close(hServerSocket) == SOCKET_ERROR)
+        if(close(hSocket) == SOCKET_ERROR)
         {
          printf("\nCould not close socket\n");
          return 0;
