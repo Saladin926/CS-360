@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
         serve(hSocket);
        
         /* close socket */
-        if(close(hSocket) == SOCKET_ERROR)
+        if(close(hServerSocket) == SOCKET_ERROR)
         {
          printf("\nCould not close socket\n");
          return 0;
