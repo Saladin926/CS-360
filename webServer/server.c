@@ -26,24 +26,22 @@ void serve(int hSocket)
         for(int i = 0; i < headers.size(); i++)
         {
             cout << "headers: " << headers[i] << endl;
-            if(strstr(headers[i], "HTTP_Referer") != NULL)
+            
+            if(strstr(headers[i], "HTTP_GET") != NULL)
             {
                 int slashPos = 0;
                 string filePointer = headers[i];
-                for(int j = 0; j < 3 ; j++)
-                {
-                    slashPos = filePointer.find("/",slashPos);
-                    slashPos += 1;
+                slashPos = filePointer.find("/",slashPos);
 
-                }
+                size_t foundSpace = filePointer.find_last_of(" ");
+                filePath = filePointer.substr(slashPos+1,foundSpace - slashPos);
 
-                if(filePointer[slashPos] != '\0')
-                {
-                    filePath = filePointer.substr(slashPos);
-                }
-
+                cout << "This is the file Path: " << filePath << endl;
+            
             }
+            
         }
+        
         cout << "***this should be the file path: " << filePath << endl;
         //set content type and content length dynamically
         //parse the get request for file extension
@@ -73,6 +71,7 @@ void serve(int hSocket)
 
         cout << "***this should be the content type: " << contentType << endl;
         //use stat to determine type of request
+        
         struct stat filestat;
         const char* charFilePath = filePath.c_str();
         if(stat(charFilePath, &filestat)) {
@@ -99,6 +98,7 @@ void serve(int hSocket)
         printf("name %s\n", dp->d_name);
         (void)closedir(dirp);
         }
+        
         //- folder
         //- regular file
         //- invalid (return 404)
@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
         Address.sin_addr.s_addr,
         ntohs(Address.sin_port));
         memset(pBuffer, 0, sizeof(pBuffer));
-        read(hSocket,pBuffer,BUFFER_SIZE);
+        //read(hSocket,pBuffer,BUFFER_SIZE);
         printf("got from browser \n %s\n",pBuffer);
 
         //call server function
