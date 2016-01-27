@@ -25,6 +25,7 @@ void serve(int hSocket)
         GetHeaderLines(headers, hSocket, false);
         for(int i = 0; i < headers.size(); i++)
         {
+            cout << "headers: " << headers[i] << endl;
             if(strstr(headers[i], "HTTP_Referer") != NULL)
             {
                 int slashPos = 0;
@@ -190,7 +191,7 @@ int main(int argc, char* argv[])
         printf("got from browser \n %s\n",pBuffer);
 
         //call server function
-        serve(hServerSocket);
+        serve(hSocket);
        
         /* close socket */
         if(close(hSocket) == SOCKET_ERROR)
