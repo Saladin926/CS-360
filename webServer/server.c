@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <sstream>
 #include "cs360utils.h"
 #define SOCKET_ERROR        -1
 #define BUFFER_SIZE         100
@@ -39,7 +40,7 @@ void serve(int hSocket)
             }
         }
         
-        cout << "File path: " << filePath << "temporarily"<< endl;
+        cout << "File path: " << filePath << endl;
         //set content type and content length dynamically
         //parse the get request for file extension
         //for the content type
@@ -67,13 +68,13 @@ void serve(int hSocket)
         }
 
         cout << "***this should be the content type: " << contentType << endl;
+        stringstream ss;
         //use stat to determine type of request
         
         struct stat filestat;
         const char* charFilePath = filePath.c_str();
         if(stat(charFilePath, &filestat)) {
             cout <<"ERROR in stat\n";
-
         }
         if(S_ISREG(filestat.st_mode)) {
             cout << filePath << " is a regular file \n";
@@ -81,7 +82,8 @@ void serve(int hSocket)
             FILE *fp = fopen(charFilePath, "r");
             char *buffer = (char*)  malloc(filestat.st_size);
             fread(buffer, filestat.st_size, 1, fp);
-            printf("Got\n%s", buffer); //for web server just print to socket instead of the screen
+            //printf("Got\n%s", buffer); //for web server just print to socket instead of the screen
+            ss << "HTTP/1.1 200 OK\r\n" << contentType << "\r\n" << filestat.st_size << "\r\n\r\n" << buffer;
             free(buffer);
             fclose(fp);
         }
@@ -94,8 +96,7 @@ void serve(int hSocket)
             while((dp = readdir(dirp)) != NULL)
             printf("name %s\n", dp->d_name);
             (void)closedir(dirp);
-        }
-        
+        } 
         //- folder
         //- regular file
         //- invalid (return 404)
@@ -103,7 +104,9 @@ void serve(int hSocket)
         //if valid file, use stat to find file size
         //if folder, return index.html if it exists, if not return a directory listing (html links)
         string msg = "HTTP/1.1 200 OK\r\nContent- Type: text/plain\r\nContent-Length: 3 \r\n\r\nhey guys!";
-        write(hSocket,msg.c_str(), msg.size());
+        const string theFile = ss.str();
+        cout << theFile << "\n";
+        write(hSocket, theFile.c_str(), theFile.size());
 }
 
 int main(int argc, char* argv[])
