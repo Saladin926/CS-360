@@ -18,7 +18,7 @@
 #define QUEUE_SIZE          5
 #define BUFFER_SIZE2         10000
 using namespace std;
-void serve(int hSocket)
+void serve(int hSocket,string prepend)
 {
     bool servedFile = false;
     vector<char*> headers;
@@ -40,7 +40,7 @@ void serve(int hSocket)
                 cout << "This is the file Path: " << filePath << endl;
             }
         }
-        
+        filePath = prepend +"/"+ filePath;
         cout << "File path: " << filePath << endl;
         //set content type and content length dynamically
         //parse the get request for file extension
@@ -74,9 +74,9 @@ void serve(int hSocket)
         
         struct stat filestat = {};
         //check if it's possibly a directory
-        if(filePath == "" || fileExt =="")
+        if(filePath == "")
         {
-            //look for index.html
+            filePath = ".";
         }
         const char* charFilePath = filePath.c_str();
         if(stat(charFilePath, &filestat)) {
@@ -122,7 +122,7 @@ void serve(int hSocket)
             {
                 memset(pBuffer,0,sizeof(pBuffer));
                 printf("<a href = \"%s\">%s</a><br>\n",dp->d_name,dp->d_name); 
-                sprintf(pBuffer,"<a href = \"%s/%s\">%s</a><br>\n",filePath.c_str(),dp->d_name,dp->d_name);
+                sprintf(pBuffer,"<a href = \"%s\">%s</a><br>\n",dp->d_name,dp->d_name);
                 ssforIndex << pBuffer;
                 if(strcmp(dp->d_name, "index.html") == 0)
                 {
@@ -172,6 +172,8 @@ void serve(int hSocket)
         if(servedFile == false)
         {
 
+            string notFound = "HTTP/1.1 404 Not Found\r\n\r\n";
+            write(hSocket, notFound.c_str(), notFound.size());
         }
         //- folder
         //- regular file
@@ -265,7 +267,7 @@ int main(int argc, char* argv[])
         printf("got from browser \n %s\n",pBuffer);
 
         //call server function
-        serve(hSocket);
+        serve(hSocket,argv[2]);
        
         /* close socket */
         if(close(hSocket) == SOCKET_ERROR)
