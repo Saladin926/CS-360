@@ -12,7 +12,8 @@ using namespace std;
 
 // Determine if the character is whitespace
 bool isWhitespace(char c)
-{ switch (c)
+{
+    switch (c)
     {
         case '\r':
         case '\n':
@@ -45,8 +46,15 @@ char * GetLine(int fds)
     int amtread = 0;
     while((amtread = read(fds, tline + messagesize, 1)) < MAX_MSG_SZ)
     {
-        if (amtread >= 0)
+
+        if (amtread > 0)
+        {
             messagesize += amtread;
+        }
+        else if( amtread == 0 )
+        {
+            break;
+        }
         else
         {
             perror("Socket Error is:");
@@ -55,7 +63,9 @@ char * GetLine(int fds)
         }
         //fprintf(stderr,"%d[%c]", messagesize,message[messagesize-1]);
         if (tline[messagesize - 1] == '\n')
+        {
             break;
+        }
     }
     tline[messagesize] = '\0';
     chomp(tline);
@@ -87,10 +97,10 @@ void UpcaseAndReplaceDashWithUnderline(char *str)
 // When calling CGI scripts, you will have to convert header strings
 // before inserting them into the environment.  This routine does most
 // of the conversion
-char *FormatHeader(char *str, const char *prefix)
+char *FormatHeader(char *str, char *prefix)
 {
     char *result = (char *)malloc(strlen(str) + strlen(prefix));
-    char* value = strchr(str,':') + 1;
+    char* value = strchr(str,':') + 2;
     UpcaseAndReplaceDashWithUnderline(str);
     *(strchr(str,':')) = '\0';
     sprintf(result, "%s%s=%s", prefix, str, value);
@@ -101,8 +111,10 @@ char *FormatHeader(char *str, const char *prefix)
 //   envformat = true when getting a request from a web client
 //   envformat = false when getting lines from a CGI program
 
-void GetHeaderLines(vector<char *> &headerLines, int skt, bool envformat)
+void GetHeaderLines(std::vector<char *> &headerLines, int skt, bool envformat)
 {
+
+    //std::cout << "1" << std::endl;
     // Read the headers, look for specific ones that may change our responseCode
     char *line;
     char *tline;
@@ -110,22 +122,24 @@ void GetHeaderLines(vector<char *> &headerLines, int skt, bool envformat)
     tline = GetLine(skt);
     while(strlen(tline) != 0)
     {
+        //std::cout << "lin: " << tline << std::endl;
+        //std::cout << "len: " << strlen( tline ) << std::endl;
         if (strstr(tline, "Content-Length") || 
             strstr(tline, "Content-Type"))
         {
             if (envformat)
-                line = FormatHeader(tline, "");
+                line = FormatHeader(tline, const_cast<char*>( "" ) );
             else
                 line = strdup(tline);
         }
         else
         {
             if (envformat)
-                line = FormatHeader(tline, "HTTP_");
+                line = FormatHeader(tline, const_cast<char*>( "HTTP_" ) );
             else
             {
                 line = (char *)malloc((strlen(tline) + 10) * sizeof(char));
-                sprintf(line, "HTTP_%s", tline);                
+                //sprintf(line, "HTTP_%s", tline);                
             }
         }
         //fprintf(stderr, "Header --> [%s]\n", line);
@@ -136,5 +150,3 @@ void GetHeaderLines(vector<char *> &headerLines, int skt, bool envformat)
     }
     free(tline);
 }
-
-
