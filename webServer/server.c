@@ -15,7 +15,7 @@
 #define BUFFER_SIZE         100
 #define MESSAGE             "This is the message I'm sending back and forth"
 #define QUEUE_SIZE          5
-
+using namespace std;
 void serve(int hSocket)
 {
 
@@ -24,9 +24,7 @@ void serve(int hSocket)
         string filePath = "";
         GetHeaderLines(headers, hSocket, false);
         for(int i = 0; i < headers.size(); i++)
-        {
-            cout << "headers: " << headers[i] << endl;
-            
+        { 
             if(strstr(headers[i], "HTTP_GET") != NULL)
             {
                 int slashPos = 0;
@@ -38,9 +36,7 @@ void serve(int hSocket)
                 filePath = filePointer.substr(slashPos,foundSpace - slashPos);
 
                 cout << "This is the file Path: " << filePath << endl;
-            
             }
-            
         }
         
         cout << "File path: " << filePath << "temporarily"<< endl;
@@ -90,14 +86,14 @@ void serve(int hSocket)
             fclose(fp);
         }
         if(S_ISDIR(filestat.st_mode)) {
-        cout << filePath << " is a directory \n";
-        DIR* dirp;
-        struct dirent *dp;
+            cout << filePath << " is a directory \n";
+            DIR* dirp;
+            struct dirent *dp;
 
-        dirp = opendir(charFilePath);
-        while((dp = readdir(dirp)) != NULL)
-        printf("name %s\n", dp->d_name);
-        (void)closedir(dirp);
+            dirp = opendir(charFilePath);
+            while((dp = readdir(dirp)) != NULL)
+            printf("name %s\n", dp->d_name);
+            (void)closedir(dirp);
         }
         
         //- folder

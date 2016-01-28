@@ -4,9 +4,8 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sstream>
-#include <iostream>
-using namespace std;
+
+//using namespace std;
 
 #define MAX_MSG_SZ      1024
 
@@ -114,7 +113,6 @@ char *FormatHeader(char *str, char *prefix)
 void GetHeaderLines(std::vector<char *> &headerLines, int skt, bool envformat)
 {
 
-    //std::cout << "1" << std::endl;
     // Read the headers, look for specific ones that may change our responseCode
     char *line;
     char *tline;
@@ -122,8 +120,6 @@ void GetHeaderLines(std::vector<char *> &headerLines, int skt, bool envformat)
     tline = GetLine(skt);
     while(strlen(tline) != 0)
     {
-        //std::cout << "lin: " << tline << std::endl;
-        //std::cout << "len: " << strlen( tline ) << std::endl;
         if (strstr(tline, "Content-Length") || 
             strstr(tline, "Content-Type"))
         {
@@ -139,10 +135,10 @@ void GetHeaderLines(std::vector<char *> &headerLines, int skt, bool envformat)
             else
             {
                 line = (char *)malloc((strlen(tline) + 10) * sizeof(char));
-                //sprintf(line, "HTTP_%s", tline);                
+                sprintf(line, "HTTP_%s", tline);                
             }
         }
-        //fprintf(stderr, "Header --> [%s]\n", line);
+        fprintf(stderr, "Header --> [%s]\n", line);
         
         headerLines.push_back(line);
         free(tline);
