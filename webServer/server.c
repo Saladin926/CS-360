@@ -16,6 +16,7 @@
 #define BUFFER_SIZE         100
 #define MESSAGE             "This is the message I'm sending back and forth"
 #define QUEUE_SIZE          5
+#define BUFFER_SIZE2         10000
 using namespace std;
 void serve(int hSocket)
 {
@@ -67,7 +68,7 @@ void serve(int hSocket)
             contentType = "Content-Type: image/gif";
         }
 
-        cout << "***this should be the content type: " << contentType << endl;
+        cout << "This should be the content type: " << contentType << endl;
         stringstream ss;
         //use stat to determine type of request
         
@@ -79,11 +80,26 @@ void serve(int hSocket)
         if(S_ISREG(filestat.st_mode)) {
             cout << filePath << " is a regular file \n";
             cout << "file size = "<<filestat.st_size <<"\n";
-            FILE *fp = fopen(charFilePath, "r");
+            FILE *fp;
+
+            if(fileExt == "jpg" || fileExt == "gif")
+            {
+                fp = fopen(charFilePath, "rb");
+                
+            }
+            else
+            {
+                fp = fopen(charFilePath, "r");
+
+            }
             char *buffer = (char*)  malloc(filestat.st_size);
             fread(buffer, filestat.st_size, 1, fp);
             //printf("Got\n%s", buffer); //for web server just print to socket instead of the screen
-            ss << "HTTP/1.1 200 OK\r\n" << contentType << "\r\n" << filestat.st_size << "\r\n\r\n" << buffer;
+            ss << "HTTP/1.1 200 OK\r\n" << contentType << "\r\n" << "Content-Length: " << filestat.st_size << "\r\n\r\n" << buffer;
+            const string headerString = ss.str();
+            cout << headerString << "\n";
+            write(hSocket, headerString.c_str(), headerString.size());
+            //write(hSocket, buffer, sizeof(buffer));
             free(buffer);
             fclose(fp);
         }
@@ -93,8 +109,16 @@ void serve(int hSocket)
             struct dirent *dp;
 
             dirp = opendir(charFilePath);
+            char pBuffer[BUFFER_SIZE2];
             while((dp = readdir(dirp)) != NULL)
-            printf("name %s\n", dp->d_name);
+            {
+                memset(pBuffer,0,sizeof(pBuffer));
+                printf("<a href = \"%s\">%s</a><br>\n",dp->d_name,dp->d_name); 
+                sprintf(pBuffer,"<a href = \"%s\">%s</a><br>\n",dp->d_name,dp->d_name);
+                write(hSocket, pBuffer, strlen(pBuffer));
+               
+            }
+           
             (void)closedir(dirp);
         } 
         //- folder
@@ -103,10 +127,8 @@ void serve(int hSocket)
         //if not valid, return canned 404 response
         //if valid file, use stat to find file size
         //if folder, return index.html if it exists, if not return a directory listing (html links)
-        string msg = "HTTP/1.1 200 OK\r\nContent- Type: text/plain\r\nContent-Length: 3 \r\n\r\nhey guys!";
-        const string theFile = ss.str();
-        cout << theFile << "\n";
-        write(hSocket, theFile.c_str(), theFile.size());
+        
+       
 }
 
 int main(int argc, char* argv[])
