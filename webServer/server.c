@@ -20,7 +20,7 @@
 using namespace std;
 void serve(int hSocket)
 {
-
+    bool servedFile = false;
     vector<char*> headers;
         //parse headers
         string filePath = "";
@@ -72,7 +72,12 @@ void serve(int hSocket)
         stringstream ss;
         //use stat to determine type of request
         
-        struct stat filestat;
+        struct stat filestat = {};
+        //check if it's possibly a directory
+        if(filePath == "" || fileExt =="")
+        {
+            //look for index.html
+        }
         const char* charFilePath = filePath.c_str();
         if(stat(charFilePath, &filestat)) {
             cout <<"ERROR in stat\n";
@@ -93,12 +98,13 @@ void serve(int hSocket)
 
             }
             char *buffer = (char*)  malloc(filestat.st_size);
-            fread(buffer, filestat.st_size, 1, fp);
+            fread(buffer, 1, filestat.st_size, fp);
             //printf("Got\n%s", buffer); //for web server just print to socket instead of the screen
-            ss << "HTTP/1.1 200 OK\r\n" << contentType << "\r\n" << "Content-Length: " << filestat.st_size << "\r\n\r\n" << buffer;
+            ss << "HTTP/1.1 200 OK\r\n" << contentType << "\r\n" << "Content-Length: " << filestat.st_size << "\r\n\r\n";
             const string headerString = ss.str();
             cout << headerString << "\n";
             write(hSocket, headerString.c_str(), headerString.size());
+            write(hSocket, buffer, filestat.st_size);
             //write(hSocket, buffer, sizeof(buffer));
             free(buffer);
             fclose(fp);
@@ -110,17 +116,63 @@ void serve(int hSocket)
 
             dirp = opendir(charFilePath);
             char pBuffer[BUFFER_SIZE2];
+            stringstream ssforIndex;
+            bool indexFound = false;
             while((dp = readdir(dirp)) != NULL)
             {
                 memset(pBuffer,0,sizeof(pBuffer));
                 printf("<a href = \"%s\">%s</a><br>\n",dp->d_name,dp->d_name); 
-                sprintf(pBuffer,"<a href = \"%s\">%s</a><br>\n",dp->d_name,dp->d_name);
-                write(hSocket, pBuffer, strlen(pBuffer));
-               
+                sprintf(pBuffer,"<a href = \"%s/%s\">%s</a><br>\n",filePath.c_str(),dp->d_name,dp->d_name);
+                ssforIndex << pBuffer;
+                if(strcmp(dp->d_name, "index.html") == 0)
+                {
+                    indexFound = true;
+                    break;
+                }
             }
-           
+            if(indexFound == true)
+            {
+                struct stat newfilestat = {};
+                string newcharFilePath = filePath + "/index.html";
+                const char* nCharFilePath = newcharFilePath.c_str();
+
+                if(stat(nCharFilePath, &newfilestat)) {
+                cout <<"ERROR in stat\n";
+                }
+                if(S_ISREG(newfilestat.st_mode)) {
+                   
+                    FILE *fp = fopen(nCharFilePath, "r");
+
+                    char *buffer = (char*)  malloc(newfilestat.st_size);
+                    fread(buffer, 1, newfilestat.st_size, fp);
+                    //printf("Got\n%s", buffer); //for web server just print to socket instead of the screen
+                    ss << "HTTP/1.1 200 OK\r\n" << "Content-Type: text/html" << "\r\n" << "Content-Length: " << newfilestat.st_size << "\r\n\r\n";
+                    const string headerString = ss.str();
+                    cout << headerString << "\n";
+                    write(hSocket, headerString.c_str(), headerString.size());
+                    write(hSocket, buffer, newfilestat.st_size);
+                    //write(hSocket, buffer, sizeof(buffer));
+                    free(buffer);
+                    fclose(fp);
+                }
+
+            }
+            else
+            {
+                stringstream headersForIndex;
+                string findIndex = ssforIndex.str();
+                headersForIndex << "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n" << "Content-Length: " << findIndex.size() << "\r\n\r\n";
+                write(hSocket, headersForIndex.str().c_str(), headersForIndex.str().size());
+                write(hSocket, findIndex.c_str(), findIndex.size());
+            }
+            
+            servedFile = true;
             (void)closedir(dirp);
         } 
+        if(servedFile == false)
+        {
+
+        }
         //- folder
         //- regular file
         //- invalid (return 404)
