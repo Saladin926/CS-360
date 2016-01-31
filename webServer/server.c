@@ -172,7 +172,7 @@ void serve(int hSocket,string prepend)
         if(servedFile == false)
         {
 
-            string notFound = "HTTP/1.1 404 Not Found\r\n\r\n<strong>404 Not Found</strong>";
+            string notFound = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: 13\r\n\r\n404 Not Found";
             write(hSocket, notFound.c_str(), notFound.size());
         }
         //- folder
