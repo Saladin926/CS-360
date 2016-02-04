@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
     for(threadID = 0; threadID < threadAmount; threadID++)
     {
         cout << "creating thread id " << threadID << endl;
-        struct thread_params* tp = (struct thread_params*)malloc(sizeof(struct thread_params));
+        struct thread_params* tp = new thread_params();
         tp->thread_id = threadID;
         tp->dir = dir;
 
