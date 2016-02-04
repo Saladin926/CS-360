@@ -233,6 +233,15 @@ int main(int argc, char* argv[])
     pthread_t threads[threadAmount];
     string dir = argv[3];
 
+    // First set up the signal handler
+    struct sigaction sigold, signew;
+
+    signew.sa_handler=handler;
+    sigemptyset(&signew.sa_mask);
+    sigaddset(&signew.sa_mask,SIGINT);
+    signew.sa_flags = SA_RESTART;
+    sigaction(SIGINT,&signew,&sigold);
+
     if(argc < 2)
     {
         printf("\nUsage: server host-port\n");
@@ -316,4 +325,8 @@ int main(int argc, char* argv[])
         sem_post(&mutex);
         sem_post(&work_to_do);
     }
+}
+void handler (int status)
+{
+    printf("received signal %d\n",status);
 }
