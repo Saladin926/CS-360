@@ -35,7 +35,7 @@ void* serve(void* arg)
 {
     long threadID = long(arg);
     struct thread_params* tp = (struct thread_params*)arg;
-
+    cout << "I'm a thread " << tp->thread_id << endl;
     for(;;)
     {
         sem_wait(&work_to_do);
@@ -44,7 +44,7 @@ void* serve(void* arg)
         int my_conn = work.front();
         work.pop();
         
-        cout << "thread ID " << threadID << " working on connection: "<< my_conn << endl;
+        cout << "thread ID " << tp->thread_id << " working on connection: "<< my_conn << endl;
         
         sem_post(&mutex);
         sem_post(&space_on_q);
@@ -246,6 +246,7 @@ int main(int argc, char* argv[])
 
     for(threadID = 0; threadID < threadAmount; threadID++)
     {
+        cout << "creating thread id " << threadID << endl;
         struct thread_params tp = {};
         tp.thread_id = threadID;
         tp.dir = dir;
