@@ -44,7 +44,7 @@ void* serve(void* arg)
         int my_conn = work.front();
         work.pop();
         
-        cout << "thread ID " << tp->thread_id << " working on connection: "<< my_conn << endl;
+        cout << "thread ID " << threadID << " working on connection: "<< my_conn << endl;
         
         sem_post(&mutex);
         sem_post(&space_on_q);
@@ -225,9 +225,11 @@ int main(int argc, char* argv[])
     int nHostPort;
     int threadAmount = atoi(argv[2]);
     int queue_size = threadAmount;//queue size is whatever is passed in from the terminal
+
     sem_init(&space_on_q,0, queue_size);
     sem_init(&work_to_do, 0,0);
     sem_init(&mutex,0, 1);
+
     long threadID;
     pthread_t threads[threadAmount];
     string dir = argv[3];
@@ -248,7 +250,7 @@ int main(int argc, char* argv[])
         tp.thread_id = threadID;
         tp.dir = dir;
 
-        int ret_val = pthread_create(&threads[threadID],NULL, serve, (void *)&tp);
+        int ret_val = pthread_create(&threads[threadID],0, serve, (void *)&tp);
     }
 
     printf("\nStarting server");
@@ -303,17 +305,15 @@ int main(int argc, char* argv[])
         /* get the connected socket */
         hSocket=accept(hServerSocket,(struct sockaddr*)&Address,(socklen_t *)&nAddressSize);
 
+        printf("\nGot a connection from %X (%d)\n",
+        Address.sin_addr.s_addr,
+        ntohs(Address.sin_port));
+
         sem_wait(&space_on_q);
         sem_wait(&mutex);
         cout << "pushed " << hSocket << endl;
         work.push(hSocket);
         sem_post(&mutex);
         sem_post(&work_to_do);
-
-        printf("\nGot a connection from %X (%d)\n",
-        Address.sin_addr.s_addr,
-        ntohs(Address.sin_port));
     }
-
-
 }
