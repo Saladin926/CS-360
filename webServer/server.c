@@ -44,7 +44,7 @@ void* serve(void* arg)
         int my_conn = work.front();
         work.pop();
         
-        cout << "working on " << tp->thread_id << " working on "<< my_conn << endl;
+        cout << "thread ID " << tp->thread_id << " working on connection: "<< my_conn << endl;
         
         sem_post(&mutex);
         sem_post(&space_on_q);
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
 
     for(threadID = 0; threadID < threadAmount; threadID++)
     {
-        struct thread_params tp;
+        struct thread_params tp = {};
         tp.thread_id = threadID;
         tp.dir = dir;
 
