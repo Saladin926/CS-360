@@ -1,2 +1,2 @@
 compile:
-	g++ -o server server.c
+	g++ -lpthread -o server server.c
