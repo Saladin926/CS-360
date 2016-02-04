@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
     int nHostPort;
     int threadAmount = atoi(argv[2]);
     int queue_size = threadAmount;//queue size is whatever is passed in from the terminal
-    struct thread_params* tp;
+   
     sem_init(&space_on_q,0, queue_size);
     sem_init(&work_to_do, 0,0);
     sem_init(&mutex,0, 1);
@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
     for(threadID = 0; threadID < threadAmount; threadID++)
     {
         cout << "creating thread id " << threadID << endl;
-        tp = (thread_params*)malloc(sizeof(struct thread_params));
+        struct thread_params* tp = (struct thread_params*)malloc(sizeof(struct thread_params));
         tp->thread_id = threadID;
         tp->dir = dir;
 
