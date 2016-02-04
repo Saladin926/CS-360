@@ -33,7 +33,6 @@ struct thread_params
 
 void* serve(void* arg)
 {
-    long threadID = long(arg);
     struct thread_params* tp = (struct thread_params*)arg;
     cout << "I'm a thread " << tp->thread_id << endl;
     for(;;)
@@ -225,7 +224,7 @@ int main(int argc, char* argv[])
     int nHostPort;
     int threadAmount = atoi(argv[2]);
     int queue_size = threadAmount;//queue size is whatever is passed in from the terminal
-
+    struct thread_params* tp;
     sem_init(&space_on_q,0, queue_size);
     sem_init(&work_to_do, 0,0);
     sem_init(&mutex,0, 1);
@@ -247,11 +246,11 @@ int main(int argc, char* argv[])
     for(threadID = 0; threadID < threadAmount; threadID++)
     {
         cout << "creating thread id " << threadID << endl;
-        struct thread_params tp = {};
-        tp.thread_id = threadID;
-        tp.dir = dir;
+        tp = malloc(sizeof(struct thread_params));
+        tp->thread_id = threadID;
+        tp->dir = dir;
 
-        int ret_val = pthread_create(&threads[threadID],0, serve, (void *)&tp);
+        int ret_val = pthread_create(&threads[threadID],0, serve, (void *)tp);
     }
 
     printf("\nStarting server");
