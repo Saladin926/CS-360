@@ -34,7 +34,7 @@ struct thread_params
 void* serve(void* arg)
 {
     long threadID = long(arg);
-    struct thread_params* tp = (struct thread_Params*)arg;
+    struct thread_params* tp = (struct thread_params*)arg;
 
     for(;;)
     {
@@ -44,7 +44,7 @@ void* serve(void* arg)
         int my_conn = work.front();
         work.pop();
         
-        cout << "working on " << tp.threadID << " working on "<< my_conn << endl;
+        cout << "working on " << tp->thread_id << " working on "<< my_conn << endl;
         
         sem_post(&mutex);
         sem_post(&space_on_q);
@@ -69,7 +69,7 @@ void* serve(void* arg)
                     cout << "This is the file Path: " << filePath << endl;
                 }
             }
-            filePath = tp.dir +"/"+ filePath;
+            filePath = tp->dir +"/"+ filePath;
             cout << "File path: " << filePath << endl;
             //set content type and content length dynamically
             //parse the get request for file extension
@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
     int nAddressSize=sizeof(struct sockaddr_in);
     char pBuffer[BUFFER_SIZE];
     int nHostPort;
-    int threadAmount = argv[2];
+    int threadAmount = atoi(argv[2]);
     int queue_size = threadAmount;//queue size is whatever is passed in from the terminal
     sem_init(&space_on_q,0, queue_size);
     sem_init(&work_to_do, 0,0);
@@ -245,10 +245,10 @@ int main(int argc, char* argv[])
     for(threadID = 0; threadID < threadAmount; threadID++)
     {
         struct thread_params tp;
-        tp.threadID = threadID;
+        tp.thread_id = threadID;
         tp.dir = dir;
 
-        int ret_val = pthread_create(&threads[threadID],NULL, serve(), (void *)&tp);
+        int ret_val = pthread_create(&threads[threadID],NULL, serve, (void *)&tp);
     }
 
     printf("\nStarting server");
