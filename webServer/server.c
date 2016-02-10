@@ -13,6 +13,8 @@
 #include <queue>
 #include <sstream>
 #include <semaphore.h>
+#include <sys/signal.h>
+
 #include "cs360utils.h"
 #define SOCKET_ERROR        -1
 #define BUFFER_SIZE         100
