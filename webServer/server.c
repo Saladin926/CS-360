@@ -243,7 +243,7 @@ int main(int argc, char* argv[])
     sigaddset(&signew.sa_mask,SIGPIPE);
     signew.sa_flags = SA_RESTART;
     sigaction(SIGPIPE,&signew,&sigold);
-
+    signal(SIGPIPE, SIG_IGN);
     if(argc < 2)
     {
         printf("\nUsage: server host-port\n");
