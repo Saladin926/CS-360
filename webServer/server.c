@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
 
 
     sigemptyset(&signew.sa_mask);
-    sigaddset(&signew.sa_mask,SIGINT);
+    sigaddset(&signew.sa_mask,SIGPIPE);
     signew.sa_flags = SA_RESTART;
     sigaction(SIGPIPE,&signew,&sigold);
 
