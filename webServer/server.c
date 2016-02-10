@@ -236,11 +236,11 @@ int main(int argc, char* argv[])
     // First set up the signal handler
     struct sigaction sigold, signew;
 
-    signew.sa_handler=handler;
+
     sigemptyset(&signew.sa_mask);
     sigaddset(&signew.sa_mask,SIGINT);
     signew.sa_flags = SA_RESTART;
-    sigaction(SIGINT,&signew,&sigold);
+    sigaction(SIGPIPE,&signew,&sigold);
 
     if(argc < 2)
     {
