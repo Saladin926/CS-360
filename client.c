@@ -149,7 +149,7 @@ int  main(int argc, char* argv[])
         stdDev += pow((tempCount-average),2);
         allTheTimes.pop();
     }
-    stdDev = stdDev/numSockets;
+    stdDev = sqrt(stdDev);
     cout << "Average: " << average << endl;
     cout << "Standard Deviation: " << stdDev << endl;
     // Now close the sockets
