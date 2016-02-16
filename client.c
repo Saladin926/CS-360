@@ -66,7 +66,6 @@ int  main(int argc, char* argv[])
     int hSocket[numSockets];                 /* handle to socket */
     struct timeval oldtime[numSockets+NSTD];
 
-    printf("\nMaking a socket");
     /* make a socket */
     for(int i = 0; i < numSockets; i++) {
         hSocket[i]=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
