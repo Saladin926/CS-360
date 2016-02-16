@@ -34,8 +34,8 @@ int  main(int argc, char* argv[])
     int nHostPort;
     char page[PAGESIZE];
     bool printAll = false;
-    int average = 0;
-    int stdDev = 0;
+    double average = 0;
+    double stdDev = 0;
     if(argc > 6 || argc < 5)
     {
         printf("\nUsage: webtest host port path count [-d]\n");
@@ -114,7 +114,7 @@ int  main(int argc, char* argv[])
         if(ret)
             perror ("epoll_ctl");
     }
-    int findAverage;
+    double findAverage;
     for(int i = 0; i < numSockets; i++) {
         struct epoll_event event;
         int rval = epoll_wait(epollFD,&event,1,-1);
