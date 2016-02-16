@@ -116,7 +116,7 @@ int  main(int argc, char* argv[])
     }
     double findAverage;
     double findTime;
-    for(int i = 0; i < numSockets; i++) {
+    for(int i = 1; i <= numSockets; i++) {
         struct epoll_event event;
         int rval = epoll_wait(epollFD,&event,1,-1);
         if(rval < 0)
