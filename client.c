@@ -142,7 +142,7 @@ int  main(int argc, char* argv[])
         average = findAverage/i;
         
     }
-    int tempCount;
+    double tempCount;
     while(!allTheTimes.empty())
     {
         tempCount = allTheTimes.front();
