@@ -33,7 +33,8 @@ int  main(int argc, char* argv[])
     int nHostPort;
     char page[PAGESIZE];
     bool printAll = false;
-
+    int average = 0;
+    int stdDev = 0;
     if(argc > 6 || argc < 5)
     {
         printf("\nUsage: webtest host port path count [-d]\n");
@@ -112,6 +113,7 @@ int  main(int argc, char* argv[])
         if(ret)
             perror ("epoll_ctl");
     }
+    int findAverage;
     for(int i = 0; i < numSockets; i++) {
         struct epoll_event event;
         int rval = epoll_wait(epollFD,&event,1,-1);
@@ -122,15 +124,24 @@ int  main(int argc, char* argv[])
         // Get the current time and subtract the starting time for this request.
         gettimeofday(&newtime,NULL);
         double usec = (newtime.tv_sec - oldtime[event.data.fd].tv_sec)*(double)1000000+(newtime.tv_usec-oldtime[event.data.fd].tv_usec);
-        std::cout << "Time "<<usec/1000000<<std::endl;
-        printf("got %d from %d\n",rval,event.data.fd);
+        if(printAll)
+        {
+            std::cout << "Time "<<usec/1000000<<std::endl;
+            printf("got %d from %d\n",rval,event.data.fd);
+        }
+        
         // Take this one out of epoll
         epoll_ctl(epollFD,EPOLL_CTL_DEL,event.data.fd,&event);
-
+        findAverage += (usec/1000000);
+        average = findAverage/i;
+        stdDev += (pow((usec/1000000),2)-average)
     }
+    stdDev = stdDev/numSockets;
+    cout << "Average: " << average << endl;
+    cout << "Standard Deviation: " << stdDev << endl;
     // Now close the sockets
     for(int i = 0; i < numSockets; i++) {
-        printf("\nClosing socket\n");
+        //printf("\nClosing socket\n");
         /* close socket */                       
         if(close(hSocket[i]) == SOCKET_ERROR)
         {
