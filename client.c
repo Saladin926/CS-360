@@ -19,6 +19,8 @@
 #define NSTD 3
 #define PAGESIZE 700
 
+using namespace std;
+
 int  main(int argc, char* argv[])
 {
     int numSockets;
@@ -32,7 +34,7 @@ int  main(int argc, char* argv[])
     char page[PAGESIZE];
     bool printAll = false;
 
-    if(argc > 6 || argc < 4)
+    if(argc > 6 || argc < 5)
     {
         printf("\nUsage: webtest host port path count [-d]\n");
         return 0;
@@ -58,6 +60,7 @@ int  main(int argc, char* argv[])
                 break;
         }
     }
+
     int hSocket[numSockets];                 /* handle to socket */
     struct timeval oldtime[numSockets+NSTD];
 
@@ -98,7 +101,7 @@ int  main(int argc, char* argv[])
         sprintf(message, "GET %s HTTP/1.1\r\nHost:%s:%d\r\n\r\n",page,strHostName,nHostPort);
         
 
-            write(hSocket[i],message,strlen(message));
+        write(hSocket[i],message,strlen(message));
         // Keep track of the time when we sent the request
         gettimeofday(&oldtime[hSocket[i]],NULL);
         // Tell epoll that we want to know when this socket has data
