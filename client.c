@@ -145,7 +145,7 @@ int  main(int argc, char* argv[])
     int tempCount;
     while(!allTheTimes.empty())
     {
-        tempCount = allTheTimes.front()
+        tempCount = allTheTimes.front();
         stdDev += pow((tempCount-average),2);
         allTheTimes.pop();
     }
