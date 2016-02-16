@@ -115,6 +115,7 @@ int  main(int argc, char* argv[])
             perror ("epoll_ctl");
     }
     double findAverage;
+    double findTime;
     for(int i = 0; i < numSockets; i++) {
         struct epoll_event event;
         int rval = epoll_wait(epollFD,&event,1,-1);
@@ -133,9 +134,12 @@ int  main(int argc, char* argv[])
         
         // Take this one out of epoll
         epoll_ctl(epollFD,EPOLL_CTL_DEL,event.data.fd,&event);
+        findTime = usec/1000000;
         findAverage += (usec/1000000);
         average = findAverage/i;
-        stdDev += pow(((usec/1000000)-average),2);
+        stdDev += pow((findTime-average),2);
+        cout << "time: " << findTime << endl;
+        cout << "average: " << average << endl;
         cout << "standard dev: " << stdDev << endl;
     }
     stdDev = stdDev/numSockets;
