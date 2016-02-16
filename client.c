@@ -136,6 +136,7 @@ int  main(int argc, char* argv[])
         findAverage += (usec/1000000);
         average = findAverage/i;
         stdDev += (pow(((usec/1000000)-average),2));
+        cout << "standard dev: " << stdDev << endl;
     }
     stdDev = stdDev/numSockets;
     cout << "Average: " << average << endl;
