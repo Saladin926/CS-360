@@ -14,6 +14,7 @@
 #define SOCKET_ERROR        -1
 #define BUFFER_SIZE         10000
 #define HOST_NAME_SIZE      255
+#define MAXGET 1000
 #define NSOCKETS 10
 #define NSTD 3
 #define PAGESIZE 700
