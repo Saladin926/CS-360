@@ -1,2 +1,2 @@
 compile:
-	g++ -o download download.c
+	g++ -o webtest webtest.c
