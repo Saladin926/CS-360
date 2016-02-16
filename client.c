@@ -10,6 +10,7 @@
 #include <sys/epoll.h>
 #include <sys/time.h>
 #include <iostream>
+#include <cmath>
 
 #define SOCKET_ERROR        -1
 #define BUFFER_SIZE         10000
