@@ -128,8 +128,8 @@ int  main(int argc, char* argv[])
         double usec = (newtime.tv_sec - oldtime[event.data.fd].tv_sec)*(double)1000000+(newtime.tv_usec-oldtime[event.data.fd].tv_usec);
         if(printAll)
         {
-            std::cout << "Time "<<usec/1000000<<std::endl;
-            printf("got %d from %d\n",rval,event.data.fd);
+            std::cout << "Time: "<<usec/1000000<<std::endl;
+            //printf("got %d from %d\n",rval,event.data.fd);
         }
         
         // Take this one out of epoll
@@ -138,9 +138,6 @@ int  main(int argc, char* argv[])
         findAverage += (usec/1000000);
         average = findAverage/i;
         stdDev += pow((findTime-average),2);
-        cout << "time: " << findTime << endl;
-        cout << "average: " << average << endl;
-        cout << "standard dev: " << stdDev << endl;
     }
     stdDev = stdDev/numSockets;
     cout << "Average: " << average << endl;
