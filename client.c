@@ -135,7 +135,7 @@ int  main(int argc, char* argv[])
         epoll_ctl(epollFD,EPOLL_CTL_DEL,event.data.fd,&event);
         findAverage += (usec/1000000);
         average = findAverage/i;
-        stdDev += (pow((usec/1000000),2)-average);
+        stdDev += (pow(((usec/1000000)-average),2));
     }
     stdDev = stdDev/numSockets;
     cout << "Average: " << average << endl;
