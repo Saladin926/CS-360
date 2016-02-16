@@ -35,7 +35,7 @@ int  main(int argc, char* argv[])
     char page[PAGESIZE];
     bool printAll = false;
     double average = 0;
-    float stdDev = 0;
+    double stdDev = 0;
     if(argc > 6 || argc < 5)
     {
         printf("\nUsage: webtest host port path count [-d]\n");
