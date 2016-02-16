@@ -11,6 +11,7 @@
 #include <sys/time.h>
 #include <iostream>
 #include <cmath>
+#include <queue>
 
 #define SOCKET_ERROR        -1
 #define BUFFER_SIZE         10000
@@ -115,6 +116,8 @@ int  main(int argc, char* argv[])
     }
     double findAverage;
     double findTime;
+    double findStdDev;
+    queue<double> allTheTimes;
     for(int i = 1; i <= numSockets; i++) {
         struct epoll_event event;
         int rval = epoll_wait(epollFD,&event,1,-1);
@@ -134,9 +137,17 @@ int  main(int argc, char* argv[])
         // Take this one out of epoll
         epoll_ctl(epollFD,EPOLL_CTL_DEL,event.data.fd,&event);
         findTime = usec/1000000;
+        allTheTimes.push(findTime);
         findAverage += (usec/1000000);
         average = findAverage/i;
-        stdDev += pow((findTime-average),2);
+        
+    }
+    int tempCount;
+    while(!allTheTimes.empty())
+    {
+        tempCount = allTheTimes.front()
+        stdDev += pow((tempCount-average),2);
+        allTheTimes.pop();
     }
     stdDev = stdDev/numSockets;
     cout << "Average: " << average << endl;
