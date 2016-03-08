@@ -6,6 +6,12 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.sendFile('weather.html',{root: 'public'});
 });
+router.get('/reverse',function(req,res,next){
+	var s = req.query.words;
+	s = s.split('').reverse().join('');
+	res.status(200).json(s);
+
+});
 router.get('/getcity',function(req,res,next) {
             console.log("In getcity route");
          fs.readFile(__dirname + '/cities.dat.txt',function(err,data) {
